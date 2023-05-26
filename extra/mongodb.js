@@ -73,3 +73,4 @@ function getAndSubmitResponseTime() {
 
 // Initial call to start the process
 getAndSubmitResponseTime();
+console.log("Starting MongoDB ping logs");
