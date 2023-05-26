@@ -72,5 +72,3 @@ function getAndSubmitResponseTime() {
 
 // Initial call to start the process
 getAndSubmitResponseTime();
-
-module.exports = getAndSubmitResponseTime;

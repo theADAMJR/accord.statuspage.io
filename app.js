@@ -71,4 +71,4 @@ function getAndSubmitResponseTime() {
 getAndSubmitResponseTime();
 
 if (process.env.MONGO_URI)
-    require("./extra/mongodb")();
+    require("./extra/mongodb");
