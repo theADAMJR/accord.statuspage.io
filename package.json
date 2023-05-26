@@ -1,5 +1,5 @@
 {
-  "name": "acrd.app-metrics",
+  "name": "acrd-metrics",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
