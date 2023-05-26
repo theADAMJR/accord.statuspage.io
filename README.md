@@ -9,6 +9,10 @@ API_KEY=<api key>
 PAGE_ID=<page id>
 METRIC_ID=<metric id>
 PING_URL=<url to ping>
+```
+
+If you want mongodb database pinging, add the following to `.env`:
+```
 MONGO_URI=mongodb://localhost:27017
 DB_METRIC_ID=<database metric id>
 ```
