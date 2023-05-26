@@ -12,7 +12,7 @@ const authHeader = { 'Authorization': `OAuth ${apiKey}` };
 const options = { method: 'POST', headers: authHeader };
 
 // Function to measure MongoDB server response time
-async function measureResponseTime() {
+async function measureResponseTime(callback) {
     const start = new Date();
     const client = new MongoClient(process.env.MONGO_URI);
 
@@ -22,10 +22,10 @@ async function measureResponseTime() {
         await client.close();
 
         const end = new Date();
-        return end - start;
+        callback(null, end - start);
     } catch (error) {
         await client.close();
-        throw error;
+        callback(error);
     }
 }
 
@@ -57,12 +57,12 @@ function submitDataPoint(responseTime) {
         });
     });
 
-    request.end(JSON.stringify({ data: data }));
+    request.end(JSON.stringify({ data }));
 }
 
 // Function to retrieve response time and submit data point
 function getAndSubmitResponseTime() {
-    measureResponseTime(process.env.PING_URL, (error, responseTime) => {
+    measureResponseTime((error, responseTime) => {
         if (error) {
             console.error(`Error measuring response time: ${error.message}`);
         } else {
