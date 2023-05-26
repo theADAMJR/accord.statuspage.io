@@ -14,16 +14,17 @@ const options = { method: 'POST', headers: authHeader };
 // Function to measure MongoDB server response time
 async function measureResponseTime() {
     const start = new Date();
+    const client = new MongoClient(process.env.MONGO_URI);
 
     try {
-        const client = new MongoClient(process.env.MONGO_URI);
         await client.connect();
-        await client.db().admin().ping();
+        await client.db("admin").command({ ping: 1 });
         await client.close();
 
         const end = new Date();
         return end - start;
     } catch (error) {
+        await client.close();
         throw error;
     }
 }
