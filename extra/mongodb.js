@@ -1,28 +1,33 @@
 require('dotenv').config();
 
 const https = require('https');
+const { MongoClient } = require('mongodb');
 
 // Configuration
 const apiKey = process.env.API_KEY;
 const pageId = process.env.PAGE_ID;
-const metricId = process.env.METRIC_ID;
+const metricId = process.env.DB_METRIC_ID;
 const apiBase = 'https://api.statuspage.io/v1';
 
 const url = `${apiBase}/pages/${pageId}/metrics/${metricId}/data.json`;
 const authHeader = { 'Authorization': `OAuth ${apiKey}` };
 const options = { method: 'POST', headers: authHeader };
 
-// Function to measure response time of a website
-function measureResponseTime(url, callback) {
+// Function to measure MongoDB server response time
+async function measureResponseTime() {
     const start = new Date();
 
-    https.get(url, (res) => {
+    try {
+        const client = new MongoClient(process.env.MONGO_URI);
+        await client.connect();
+        await client.db().admin().ping();
+        await client.close();
+
         const end = new Date();
-        const responseTime = end - start;
-        callback(null, responseTime);
-    }).on('error', (error) => {
-        callback(error);
-    });
+        return end - start;
+    } catch (error) {
+        throw error;
+    }
 }
 
 // Function to submit data point to Statuspage.io
@@ -40,7 +45,7 @@ function submitDataPoint(responseTime) {
         }
 
         res.on('data', () => {
-            console.log(`[API] Data point submitted successfully: ${responseTime}ms.`);
+            console.log(`[DB] Data point submitted successfully: ${responseTime}ms.`);
         });
 
         res.on('end', () => {
@@ -70,5 +75,4 @@ function getAndSubmitResponseTime() {
 // Initial call to start the process
 getAndSubmitResponseTime();
 
-if (process.env.MONGO_URI)
-    require("./extra/mongodb")();
+module.exports = getAndSubmitResponseTime;
