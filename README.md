@@ -1,22 +1,10 @@
 # Statuspage.io Metrics
-Ping a URL every 5 minutes and post it to statuspage metrics. 
+Ping a URL every 5 minutes and post it to statuspage metrics. Also supports pinging MongoDB and MySQL databases.
 
 ## Setup
 1) `npm i`
-2) Add `.env` file:
-```
-API_KEY=<api key>
-PAGE_ID=<page id>
-METRIC_ID=<metric id>
-PING_URL=<url to ping>
-```
+2) `cp .env.example .env` and edit accordingly
 
-If you want mongodb database pinging, add the following to `.env`:
-```
-MONGO_URI=mongodb://localhost:27017
-DB_METRIC_ID=<database metric id>
-```
-
-`MONGO_URI` and `DB_METRIC_ID` are optional and add support for pinging your mongodb database.
-
-Demo: https://accord.statuspage.io
+Used by:
+- https://accord.statuspage.io
+- https://newstars.statuspage.io

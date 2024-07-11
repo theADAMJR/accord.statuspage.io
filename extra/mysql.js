@@ -1,27 +1,47 @@
-require('dotenv').config();
-
 const https = require('https');
+const mysql = require('mysql2');
 
 // Configuration
 const apiKey = process.env.API_KEY;
 const pageId = process.env.PAGE_ID;
-const metricId = process.env.METRIC_ID;
+const metricId = process.env.MYSQL_METRIC_ID;
 const apiBase = 'https://api.statuspage.io/v1';
 
 const url = `${apiBase}/pages/${pageId}/metrics/${metricId}/data.json`;
 const authHeader = { 'Authorization': `OAuth ${apiKey}` };
 const options = { method: 'POST', headers: authHeader };
 
-// Function to measure response time of a website
-function measureResponseTime(url, callback) {
-    const start = new Date();
+// MySQL connection configuration
+const connectionConfig = {
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USERNAME,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,  // Replace with your database name
+};
 
-    https.get(url, (res) => {
-        const end = new Date();
-        const responseTime = end - start;
-        callback(null, responseTime);
-    }).on('error', (error) => {
-        callback(error);
+// Function to measure MySQL server response time
+function measureResponseTime(callback) {
+    const start = new Date();
+    const connection = mysql.createConnection(connectionConfig);
+
+    connection.connect((err) => {
+        if (err) {
+            console.error('Connection to MySQL database failed');
+            callback(err);
+            return;
+        }
+
+        connection.query('SELECT 1', (error) => {
+            connection.end();
+
+            if (error) {
+                callback(error);
+                return;
+            }
+
+            const end = new Date();
+            callback(null, end - start);
+        });
     });
 }
 
@@ -40,7 +60,7 @@ function submitDataPoint(responseTime) {
         }
 
         res.on('data', () => {
-            console.log(`[API] Data point submitted successfully: ${responseTime}ms.`);
+            console.log(`[DB] Data point submitted successfully: ${responseTime}ms.`);
         });
 
         res.on('end', () => {
@@ -53,12 +73,12 @@ function submitDataPoint(responseTime) {
         });
     });
 
-    request.end(JSON.stringify({ data: data }));
+    request.end(JSON.stringify({ data }));
 }
 
 // Function to retrieve response time and submit data point
 function getAndSubmitResponseTime() {
-    measureResponseTime(process.env.PING_URL, (error, responseTime) => {
+    measureResponseTime((error, responseTime) => {
         if (error) {
             console.error(`Error measuring response time: ${error.message}`);
         } else {
@@ -69,9 +89,4 @@ function getAndSubmitResponseTime() {
 
 // Initial call to start the process
 getAndSubmitResponseTime();
-
-if (process.env.MONGO_METRIC_ID)
-    require("./extra/mongodb");
-
-if (process.env.MYSQL_METRIC_ID)
-    require("./extra/mysql");
+console.log("Starting MySQL ping logs");

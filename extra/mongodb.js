@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 // Configuration
 const apiKey = process.env.API_KEY;
 const pageId = process.env.PAGE_ID;
-const metricId = process.env.DB_METRIC_ID;
+const metricId = process.env.MONGO_METRIC_ID;
 const apiBase = 'https://api.statuspage.io/v1';
 
 const url = `${apiBase}/pages/${pageId}/metrics/${metricId}/data.json`;
